@@ -15,6 +15,7 @@ char pass[] = "password";
 #define DHT11_PIN 12
 DHT DHT(DHT11_PIN, DHT11);
 LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 5, 16);
+
 float user_input;
 
 BLYNK_WRITE(V1)
@@ -27,8 +28,6 @@ BLYNK_WRITE(V1)
   Serial.print("V1 Slider value is: ");
   Serial.println(user_input);
 }
-
-
 
 
 
@@ -63,12 +62,6 @@ void myTimerEvent()
 }
 
 
-void notify(){
-  
-  Blynk.notify("SHOWER READY");
-  delay(5000);
-  
-  }
 
 bool alert = true;
 bool on = false;
@@ -80,11 +73,11 @@ int firstRead = 0;
 void checker(){
   
   if(fr){
-  if (humidity != 0){
+
     firstRead = (int) humidity;
     fr = false;
-  }else if(fr > (int) humidity){firstRead = humidity;}
-  }
+  }else if(firstRead > (int) humidity){firstRead = humidity;}
+  
   Serial.print("First read is: ");
   Serial.println(firstRead);
 
@@ -97,19 +90,21 @@ void checker(){
   }
 
   if (differential > 21) {function = differential;}
-  boolean toggle1 = true;
+
 
     if (abs(function - differential + 0.1) < 1) {
 
     hs = "SHOWER READY!  ";
     ts = "                ";
+    printer();
     
     Serial.println( "CONDITIONAL TRUE" );
     
-    notify();
+    Blynk.notify("SHOWER READY");
+    delay(5000);
 
-    
-    toggle1 = true;
+
+
 
       } else{
        
@@ -118,18 +113,13 @@ void checker(){
        Serial.print("V1 Slider value is: ");
        Serial.println(user_input);
        
-       
-       if (toggle1){
-        hs="Humidity: "+String((int)humidity)+" % ";
-        ts="Temp: "+String((int)temperature)+" C ";
-        toggle1 = false;}
+        hs="Humidity: "+String((int)humidity)+" %   ";
+        ts="Temp: "+String((int)temperature)+" C    ";
+        
 
        
         }
   }
-
-
-
 
 
 
